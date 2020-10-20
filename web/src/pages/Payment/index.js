@@ -43,7 +43,7 @@ export default function Payment(props) {
             billing,
             items
         }
-        api.post('/payment', data)
+        api.post('/credit-card', data)
         .then(response => console.log(response.data))
         .catch(err => console.log(err.response.data.error, err.response.data.message))
     }

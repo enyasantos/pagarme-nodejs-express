@@ -5,9 +5,12 @@ const qs = require('qs');
 const pagarme = require('pagarme');
 const connection = require('./database/connection');
 require('dotenv/config');
+const routes = require('./routes');
 
-app.use(cors());
 app.use(express.json());
+app.use(cors());
+app.use(routes);
+
 
 app.get("/", async (req, res) => {
     const response = await pagarme.client
@@ -141,6 +144,31 @@ app.post('/payment', async (req, res) => {
   }
 
 });
+
+app.post('/validation', async (req, res) => {
+  const {
+    card_number,
+    card_holder_name,
+    card_expiration_date,
+    card_cvv,
+  } = req.body;
+
+  const card = {
+    card_number,
+    card_holder_name,
+    card_expiration_date,
+    card_cvv,
+  }
+
+  var cardValidations = await pagarme.validate({card: card})
+         
+  console.log(cardValidations)
+
+  if(!cardValidations.card.card_number)
+    return res.status(400).send('Oops, número de cartão incorreto')
+
+  return res.status(200).send()
+})
 
 app.post('/pagar', async (req, res) => {
     const response = await pagarme.client
