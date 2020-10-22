@@ -2,13 +2,10 @@ import React, { useState, useEffect } from 'react';
 import api from '../../service/api';
 import Cards from 'react-credit-cards';
 import 'react-credit-cards/es/styles-compiled.css';
-import { useHistory } from 'react-router-dom';
 
-import { About, Form, CrediCard } from './styles';
+import { Form, CrediCard } from './styles';
 
 export default function Payment(props) {
-
-    const history = useHistory();
 
     /*
         4111111111111111
@@ -17,21 +14,32 @@ export default function Payment(props) {
         123
     */
 
-    const [ items, setItems ] = useState([]);
+    const [ product, setProduct ] = useState([]);
 
     const [ customer, setCustomer ] = useState({});
     const [ billing, setBilling ] = useState({});
 
     const [ paymentMethod, setPaymentMethod ] = useState('');
     const [ amount, setAmount ] = useState(0);
-    const [ cvc, setCvc ] = useState('');
-    const [ expiry, setExpiry ] = useState('');
     const [ focus, setFocus ] = useState('');
-    const [ name, setName ] = useState('');
-    const [ number, setNumber ] = useState('');
+    const [ cvc, setCvc ] = useState(123);
+    const [ expiry, setExpiry ] = useState(1225);
+    const [ name, setName ] = useState('abc');
+    const [ number, setNumber ] = useState(4111111111111111);
 
     function handlePayment(e) {
         e.preventDefault();
+        const items = product.map(p => {
+            return (
+                {
+                    id: p.id,
+                    title: p.name,
+                    unit_price: p.price,
+                    quantity: 1,
+                    tangible: true
+                }
+            )
+        })
         const data = {
             amount,
             payment_method: paymentMethod,
@@ -84,18 +92,9 @@ export default function Payment(props) {
         const { product, totalValue } = props.location.state;
         setAmount(totalValue);
         setPaymentMethod('credit_card');
-        const items = [ 
-            {
-                id: product.id,
-                title: product.name,
-                unit_price: product.price,
-                quantity: 1,
-                tangible: true
-            }
-        ];
-        setItems(items);
+        setProduct(product);
         loadingDataUser();
-    }, [])
+    }, [props.location.state])
     
     return (
        <>
@@ -112,14 +111,17 @@ export default function Payment(props) {
                     type="tel"
                     name="number"
                     placeholder="Número do cartão"
+                    value={number}
                     onChange={e => setNumber(e.target.value)} 
-                    onFocus={ e => setFocus(e.target.name)}  
+                    onFocus={ e => setFocus(e.target.name)} 
+                    maxLength="16" 
                     required
                 />
                 <input
                     type="text"
                     name="name"
                     placeholder="Nome (Igual no cartão)"
+                    value={name}
                     onChange={e => setName(e.target.value)}   
                     onFocus={ e => setFocus(e.target.name)} 
                     required
@@ -128,16 +130,20 @@ export default function Payment(props) {
                     type="tel"
                     name="expiry"
                     placeholder="Data de validade"
+                    value={expiry}
                     onChange={e => setExpiry(e.target.value)} 
-                    onFocus={ e => setFocus(e.target.name)}   
+                    onFocus={ e => setFocus(e.target.name)} 
+                    maxLength="4"  
                     required
                 />
                 <input
                     type="tel"
                     name="cvc"
                     placeholder="CVV"
+                    value={cvc}
                     onChange={e => setCvc(e.target.value)} 
                     onFocus={ e => setFocus(e.target.name)} 
+                    maxLength="3"
                     required  
                 />
                 <button type="submit" onClick={e => handlePayment(e)}>{`Pagar (R$ ${amount})`}</button>
@@ -146,71 +152,3 @@ export default function Payment(props) {
        </>
     );
 }
-
-
-// export default class Payment extends React.Component {
-//   state = {
-//     cvc: '',
-//     expiry: '',
-//     focus: '',
-//     name: '',
-//     number: '',
-//   };
-
-//   handleInputFocus = (e) => {
-//     this.setState({ focus: e.target.name });
-//   }
-  
-//   handleInputChange = (e) => {
-//     const { name, value } = e.target;
-    
-//     this.setState({ [name]: value });
-//     console.log(this.state.name);
-//   }
-
-  
-  
-//   render() {
-//     return (
-//       <div id="PaymentForm">
-//         <Cards
-//           cvc={this.state.cvc}
-//           expiry={this.state.expiry}
-//           focused={this.state.focus}
-//           name={this.state.name}
-//           number={this.state.number}
-//         />
-//         <form>
-//         	<input
-//                 type="tel"
-//                 name="number"
-//                 placeholder="Card Number"
-//                 onChange={this.handleInputChange}
-//                 onFocus={this.handleInputFocus}
-//             />
-//             <input
-//                 type="text"
-//                 name="name"
-//                 placeholder="Nome (Igual no cartão)"
-//                 onChange={this.handleInputChange}
-//                 onFocus={this.handleInputFocus}  
-//             />
-//             <input
-//                 type="tel"
-//                 name="expiry"
-//                 placeholder="Nome (Igual no cartão)"
-//                 onChange={this.handleInputChange}
-//                 onFocus={this.handleInputFocus}   
-//             />
-//             <input
-//                 type="tel"
-//                 name="cvc"
-//                 placeholder="CVV"
-//                 onChange={this.handleInputChange}
-//                 onFocus={this.handleInputFocus}  
-//             />
-//         </form>
-//       </div>
-//     );
-//   }
-// }

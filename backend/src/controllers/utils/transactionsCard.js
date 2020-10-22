@@ -1,23 +1,25 @@
 const pagarme = require('pagarme');
 
+const utils = require('./utils');
+
 /*
     billing => dados de cobrança
     shipping => dados de envio
 */
 
-const transactions = {
+const transactionsCard = {
     async paymentCard(card_hash, amount, customer, billing, items) {
         const response = await pagarme.client
         .connect({ api_key: process.env.API_KEY_PAGARME })
         .then(client => {
             return client.transactions.create({
-            amount,
+            amount: utils.priceFormated(amount),
             payment_method: 'credit_card',
             card_hash,
             //postback_url: '',
             customer,
             billing,
-            items,
+            items: utils.formatedItems(items),
             })
         })
         .then(transaction => transaction )
@@ -51,24 +53,6 @@ const transactions = {
         .then(card_hash => card_hash)
         return card_hash 
     },
-
-    formatedItems(items) {
-        const newItens = items.map( item => {
-          const i = {
-            id: item.id.toString(),
-            title: item.title,
-            unit_price: parseInt(Math.ceil(item.unit_price * 100)),
-            quantity: item.quantity,
-            tangible: item.tangible
-          }
-          return i
-        })
-        return newItens;
-    },
-
-    priceFormated(amount) {
-        return parseInt(Math.ceil(amount * 100))
-    },
 }
 
-module.exports = transactions;
+module.exports = transactionsCard;
