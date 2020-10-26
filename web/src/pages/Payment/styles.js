@@ -43,6 +43,8 @@ export const Form = styled.div `
         letter-spacing: .1em;
 
         padding: 10px 0;
+        margin-bottom: 20px;
+        
         transition: all .3s;
 
         &:hover {

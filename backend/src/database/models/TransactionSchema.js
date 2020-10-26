@@ -2,28 +2,32 @@
 const mongoose = require('mongoose');
 
 const TransactionSchema = new mongoose.Schema({
-    user_id:{
+    user:{
         type: String,
         required: true,
     },
-    transaction_id: {
-        type: String,
-        required: true,
-    },
-    amount:{
-        type: String,
+    transaction: {
+        type: Number,
         required: true,
     },
     payment_method:{
         type: String,
         required: true,
     },
+    value:{
+        type: Number,
+        required: true,
+    },
+    paid_value: {
+        type: Number,
+        required: true,
+    },
     status:{
         type: String,
         required: true,
     },
-    items: {
-        type: [String],
+    products: {
+        type: [Object],
         required: true,
     }
 }, {timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }});

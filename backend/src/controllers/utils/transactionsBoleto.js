@@ -20,20 +20,48 @@ const transactionsBoleto = {
         const response = await pagarme.client
         .connect({ api_key: process.env.API_KEY_PAGARME })
         .then(client => client.transactions.create({
-          amount: utils.priceFormated(amount),
-          payment_method: 'boleto',
-          boleto_expiration_date,
-          //postback_url: 'http://requestb.in/pkt7pgpk',
-          capture: true,
-          customer,
-          shipping,
-          items: utils.formatedItems(items),
+            capture: true,
+            amount: utils.priceFormated(amount),
+            payment_method: 'boleto',
+            boleto_expiration_date,
+            postback_url: process.env.POSTBACK_URL,
+            //postback_url: 'https://3d43dd53bb268f29218ca7477dcbdb24.m.pipedream.net',
+            customer,
+            shipping,
+            items: utils.formatedItems(items),
         }))
         .then(transaction => transaction )
         .catch(e => e.response)
 
         return response;
     },
+
+    /* Usado apenas em ambiente de teste para simular o pagamento de um boleto*/
+    async payingBoleto(transaction_id) {
+        const response = pagarme.client.connect({ api_key: process.env.API_KEY_PAGARME })
+        .then(client => {
+            client.transactions.find({ id: transaction_id })
+            .then(transaction => {
+                client.transactions.update({
+                id: transaction.id,
+                status: 'paid',
+                })
+            })
+        })
+        .catch(e => e.response)
+
+        return response
+    },
+
+    async estorno(transaction_id, bank_account) {
+        const response = await pagarme.client.connect({ api_key: process.env.API_KEY_PAGARME })
+        .then(client => client.transactions.refund({
+            id: transaction_id,
+            bank_account
+        }))
+        .catch(e => e.response)
+        return response
+    }
 }
 
 module.exports = transactionsBoleto;

@@ -10,19 +10,53 @@ export const Wrapper = styled.div `
     flex-wrap: wrap;
 
     margin: auto;
+
 `;
 
-export const Title = styled.div `
+export const Header = styled.div `
     width: 100%;
     text-align: center;
     margin-top: 20px;
-    a {
-        text-decoration: none;
+
+    position: relative;
+
+    p {
         text-transform: uppercase;
         font-size: 24px;
         font-weight: bold;
         color: #393554;
         letter-spacing: .1em;
+    }
+
+    .cart {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        display: flex;
+        align-items:center;
+
+        div {
+            position: absolute;
+            bottom: 12px;
+            left: 15px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+
+            background: #f880a0;
+
+            display: flex;
+            align-items:center;
+            justify-content: center;
+
+            p {
+                margin-left: 2px;
+                text-align: center;
+                font-size: 12px;
+                color: #FFFF;
+            }
+        }
     }
 `
 

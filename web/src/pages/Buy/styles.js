@@ -16,7 +16,7 @@ export const Title = styled.div `
     }
 `;
 
-export const Product = styled.div `
+export const MethodPayment = styled.div `
     width: 400px;
 
     display: flex;
@@ -48,7 +48,7 @@ export const Product = styled.div `
         margin: 10px 0;
     }
 
-    button {
+    button, a {
         width: 100%;
         margin-top: 10px;
 
@@ -57,6 +57,8 @@ export const Product = styled.div `
 
         font-size: 14px;
         text-transform: uppercase;
+        text-decoration: none;
+        text-align: center;
         letter-spacing: .1em;
         color: #401b40;
 

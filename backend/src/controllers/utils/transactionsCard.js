@@ -16,7 +16,8 @@ const transactionsCard = {
             amount: utils.priceFormated(amount),
             payment_method: 'credit_card',
             card_hash,
-            //postback_url: '',
+            postback_url: process.env.POSTBACK_URL,
+            //postback_url: 'https://3d43dd53bb268f29218ca7477dcbdb24.m.pipedream.net',
             customer,
             billing,
             items: utils.formatedItems(items),
@@ -51,8 +52,43 @@ const transactionsCard = {
             });
         })
         .then(card_hash => card_hash)
+        .catch(e => e.response)
         return card_hash 
     },
+
+    //Pagamento parcelado
+    async paymentInstallments(amount, free_installments, max_installments,interest_rate) {
+        const response = await pagarme.client.connect({ api_key: process.env.API_KEY_PAGARME })
+        .then(client => client.transactions.calculateInstallmentsAmount({
+          max_installments, //Valor máximo de parcelas
+          free_installments, //Número de parcelas isentas de juros
+          interest_rate, //Valor da taxa de juros
+          amount
+        }))
+        .then(installments => installments)
+        .catch(e => e.response)
+
+        return response
+    },
+
+    //Retorna todos os eventos de mudança de status de uma transação.
+    async allTransactionsEvents(transaction_id) {
+        const response = await pagarme.client.connect({ api_key: process.env.API_KEY_PAGARME })
+        .then(client => client.events.find({ transactionId: transaction_id}))
+        .then(events => events)
+        .catch(e => e.response)
+        
+        return response
+    },
+
+    async estorno(transaction_id) {
+        const response = await pagarme.client.connect({ api_key: process.env.API_KEY_PAGARME })
+        .then(client => client.transactions.refund({
+            id: transaction_id
+        }))
+        .catch(e => e.response)
+        return response
+    }
 }
 
 module.exports = transactionsCard;

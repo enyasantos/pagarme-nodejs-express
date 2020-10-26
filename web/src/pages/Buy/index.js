@@ -1,30 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import api from '../../service/api';
+import {useCart} from '../../context/cart';
 
-import { Title, Product } from './styles';
+import { Title, MethodPayment } from './styles';
 
-export default function Buy( props ) {
+export default function Buy() {
 
     const history = useHistory();
 
-    const [ product, setProduct ] = useState([]);
-    const [ totalValue, setTotalValue ] = useState(0);
+    const { cart, totalValue, freteValue } = useCart();
 
     const [ customer, setCustomer ] = useState({});
     const [ shipping, setShipping ] = useState({});
 
-    function handlePaymentCard(e) {
-        e.preventDefault();
-        history.push({
-            pathname: '/payment',
-            state: { product, totalValue }
-        })
-    }
-
     function handlePaymentBoleto(e) {
         e.preventDefault();
-        const items = product.map(p => {
+        const items = cart.map(p => {
             return (
                 {
                     id: p.id,
@@ -84,32 +76,19 @@ export default function Buy( props ) {
     }
 
     useEffect(() => {
-        const { product } = props.location.state;
-        setProduct([product]);
-        const value = (product.price + 5)
-        setTotalValue(value.toFixed(2));
         loadingDataUser();
-    }, [props.location.state])
+    }, [])
     
     return (
        <>
-            {product.map(p => (
-                <div key={p.id}>
-                    <Title>
-                        <p>Comprar {p.name}</p>
-                    </Title>
-                    <Product>
-                        <h3>{p.name}</h3>
-                        <img src={p.image} alt={p.name}/>
-                        <p>{p.description}</p>
-                        <p>Valor do produto: <strong>{p.price}</strong></p>
-                        <p>Valor do frete: <strong>5.00</strong></p>
-                        <p>Valor total: <strong>{totalValue}</strong></p> 
-                        <button onClick={e => handlePaymentCard(e)}>Pagar com cartão de crédito</button>
-                        <button onClick={e => handlePaymentBoleto(e)}>Pagar com boleto bancario</button>
-                    </Product>
-                </div>
-            ))}
+        <Title>
+            <p>Pagamento</p>
+        </Title>
+        <MethodPayment>
+            <Link to="/payment">Pagar com cartão de crédito R$ ({parseFloat(totalValue) + parseFloat(freteValue)})</Link>
+            <button onClick={e => handlePaymentBoleto(e)}>Pagar com boleto bancario (R$ {parseFloat(totalValue) + parseFloat(freteValue)})</button>
+            <button onClick={e => history.goBack()}>Voltar</button>
+        </MethodPayment>
        </>
     );
 }

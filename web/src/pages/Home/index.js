@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
-
-import { Wrapper , Title, Cards, Card } from './styles';
+import { Link } from 'react-router-dom';
+import { ImCart } from 'react-icons/im';
+import { Wrapper , Header, Cards, Card } from './styles';
 
 import Prod01 from '../../assets/products/p1.jpg';
 import Prod02 from '../../assets/products/p2.jpg'
@@ -10,19 +10,13 @@ import Prod04 from '../../assets/products/p4.jpg'
 import Prod05 from '../../assets/products/p5.jpg'
 import Prod06 from '../../assets/products/p6.jpg'
 
+import {useCart} from '../../context/cart';
+
 export default function Home() {
 
-    const history = useHistory();
+    const { add, cart } = useCart();
 
     const [ products, setProducts ] = useState([]);
-
-    function handleBuy(e, product) {
-        e.preventDefault();
-        history.push({
-            pathname: '/buy',
-            state: { product }
-        })
-    }
 
     useEffect(() => {
         const arrayP = [
@@ -81,9 +75,14 @@ export default function Home() {
     return (
        <>
        <Wrapper>
-           <Title>
-               <a href="/">Produtos</a>
-           </Title>
+           <Header>
+               <p href="/">Produtos</p>
+               <Link to="/cart" className="cart">
+                    <ImCart size={20} color="#393554"/>
+                    <div><p>{cart.length}</p></div>
+                </Link>
+           </Header>
+            
             <Cards>
                 {products.map( product => (
                     <Card key={product.id}>
@@ -92,9 +91,10 @@ export default function Home() {
                         <p className="price">R$ {product.price}</p>
                         <button 
                                 type="submit"
-                                onClick={ e => handleBuy(e, product)}
+                                // onClick={ e => handleBuy(e, product)}
+                                onClick={ e => add(product)}
                         >
-                            Comprar
+                            Adicinar ao carrinho
                         </button>
                     </Card>
                 ))}

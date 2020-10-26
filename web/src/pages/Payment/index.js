@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import api from '../../service/api';
 import Cards from 'react-credit-cards';
+import {useCart} from '../../context/cart';
 import 'react-credit-cards/es/styles-compiled.css';
 
 import { Form, CrediCard } from './styles';
@@ -14,7 +16,9 @@ export default function Payment(props) {
         123
     */
 
-    const [ product, setProduct ] = useState([]);
+    const history = useHistory();
+
+    const { cart, totalValue, freteValue } = useCart();
 
     const [ customer, setCustomer ] = useState({});
     const [ billing, setBilling ] = useState({});
@@ -29,7 +33,7 @@ export default function Payment(props) {
 
     function handlePayment(e) {
         e.preventDefault();
-        const items = product.map(p => {
+        const items = cart.map(p => {
             return (
                 {
                     id: p.id,
@@ -89,12 +93,11 @@ export default function Payment(props) {
     }
 
     useEffect(() => {
-        const { product, totalValue } = props.location.state;
-        setAmount(totalValue);
+        const amount = parseFloat(totalValue) + parseFloat(freteValue);
+        setAmount(amount);
         setPaymentMethod('credit_card');
-        setProduct(product);
         loadingDataUser();
-    }, [props.location.state])
+    }, [totalValue, freteValue])
     
     return (
        <>
@@ -147,6 +150,7 @@ export default function Payment(props) {
                     required  
                 />
                 <button type="submit" onClick={e => handlePayment(e)}>{`Pagar (R$ ${amount})`}</button>
+                <button type="submit" onClick={e => history.goBack()}>Voltar</button>
             </Form>
         </CrediCard>
        </>
