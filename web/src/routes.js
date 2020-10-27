@@ -5,7 +5,9 @@ import Home from './pages/Home';
 import Buy from './pages/Buy';
 import Payment from './pages/Payment';
 import Cart from './pages/Cart';
+import Info from './pages/Info';
 import Admin from './pages/Admin';
+
 import CartProvider from './context/cart';
 
 export default function() {
@@ -17,6 +19,7 @@ export default function() {
                     <Route path="/buy" component={Buy}/>
                     <Route path="/payment" component={Payment}/>
                     <Route path="/cart" component={Cart} />
+                    <Route path="/info" component={Info} />
                     <Route path="/admin" component={Admin}/>
                 </Switch>
             </BrowserRouter> 

@@ -59,6 +59,7 @@ export const Cards = styled.div`
         }
 
         p {
+            margin-top: 10px;
             font-size: 28px;
             font-family: 'Cousine', monospace;
             color: #f37d68;
@@ -67,6 +68,25 @@ export const Cards = styled.div`
         span {
             font-family: 'Cousine', monospace;
             font-size: 14px;
+        }
+
+        button {
+            border: none;
+            text-transform: uppercase;
+
+            background: #65a300;
+            color: #FFFF;
+            font-weight: bold;
+            letter-spacing: .05em;
+
+            margin-top: 10px;
+            padding: 5px 0;
+
+            transition: background .3s;
+
+            &:hover {
+                background: #7ECD2D;
+            }
         }
     }
 `;

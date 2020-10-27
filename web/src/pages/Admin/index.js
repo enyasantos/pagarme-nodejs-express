@@ -21,8 +21,51 @@ export default function Admin() {
             return 'darkorange'
         else if(status === 'refused' || status === 'refunded')
             return 'crimson'
+        else if(status === 'processing')
+            return '#0c6476'
         else
             return '#2c292d';
+    }
+
+    function handleDraft(e) {
+        e.preventDefault();
+        const today = Date();
+        const data = {
+            amount: balance.available,
+            recipient_id: "re_ckg0c4mu107pi0g9tbvmijryl",
+            metadata: {
+                created_at: today
+            }
+        }
+
+        api.post('/transferencias', data)
+        .then(response => console.log(response.data))
+        .catch(err => alert(err.response.data.message.errors[0].message))
+    }
+
+    function handleAnticipations(e) {
+        e.preventDefault();
+        api.get('antecipacoes-limite', 
+        {params: {
+            recipientId: "re_ckg0c4mu107pi0g9tbvmijryl",
+            timeframe: "start"
+        }})
+        .then(response => {
+            const { maximum, minimum } = response.data;
+            if(maximum.amount === 0 && minimum.amount === 0)
+                alert('Não há saldo disponivel para antecipar.');
+            else {
+                const data = {
+                    recipientId: "re_ckg0c4mu107pi0g9tbvmijryl",
+                    timeframe: 'start', // start, end
+                    requested_amount: maximum.amount,
+                }
+                api.post('/antecipacoes', data)
+                .then(response => console.log(response.data))
+                .catch(err => alert(err.response.data.message.errors[0].message))
+            }
+        })
+        .catch(err => alert(err.response.data.message.errors[0].message))
     }
 
     useEffect(() => {
@@ -30,7 +73,7 @@ export default function Admin() {
         .then(response => setBalance(response.data))
         .catch(err => console.log('error'))
         loadTransactions()
-    }, [])
+    }, [handleDraft])
 
     return (
        <Wrapper>
@@ -41,14 +84,22 @@ export default function Admin() {
                <div className="card">
                    <h3>Saldo atual</h3>
                     {balance.available
-                    ?<p>R$ {balance.available.toFixed(2)}</p>
+                    ?
+                    <>
+                        <p>R$ {balance.available.toFixed(2)}</p>
+                        <button onClick={e => handleDraft(e)}>Sacar</button>
+                    </>
                     :<span>Não há saldo atual.</span>
                     }
                </div>
                <div className="card">
                     <h3>A receber</h3>
                     {balance.waiting_funds
-                    ?<p>R$ {balance.waiting_funds.toFixed(2)}</p>
+                    ?
+                    <>
+                        <p>R$ {balance.waiting_funds.toFixed(2)}</p>
+                        <button onClick={e =>  handleAnticipations(e)}>Antecipar</button>
+                    </>
                     :<span>Não há valor para receber.</span>
                     }
                </div>
@@ -75,23 +126,22 @@ export default function Admin() {
                        </tr>
                    </thead>
                    <tbody>
-                       {transactions.map(t => (
-                           <tr key={t._id}>
-                                <td>{t.transaction}</td>
+                       {transactions.map((t, index )=> (
+                           <tr key={index}>
+                                <td>{t.tid}</td>
                                 <td>{t.payment_method}</td>
-                                <td>{t.user}</td>
+                                <td>{t.uid}</td>
                                 <td>R$ {t.value}</td>
-                                <td>{t.products.map((item, index) =>{
-                                    if(index !== (t.products.length - 1))
+                                <td>{t.items.map((item, index) =>{
+                                    if(index !== (t.items.length - 1))
                                         return `${item.title}, `
                                     return `${item.title}`
-
                                 })}</td>
                                 <td style={{ color: setColorStatus(t.status)}}>
                                     {t.status}
                                 </td>
-                                <td>{t.created_at}</td>
-                                <td>{t.updated_at}</td>
+                                <td>{t.create_at}</td>
+                                <td>{t.update_at}</td>
                             </tr>
                        ))}
                    </tbody>

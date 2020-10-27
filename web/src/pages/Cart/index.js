@@ -68,7 +68,7 @@ export default function Cart( ) {
                             <Link to="/">Voltar à loja</Link>
                         </Button>
                         <Button className="buy">
-                            <Link to="/buy">Finalizar compra</Link>
+                            <Link to="/info">Finalizar compra</Link>
                         </Button>
                     </Buttons>
                 }

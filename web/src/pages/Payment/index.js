@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory,useLocation } from 'react-router-dom';
 import api from '../../service/api';
 import Cards from 'react-credit-cards';
 import {useCart} from '../../context/cart';
@@ -17,11 +17,13 @@ export default function Payment(props) {
     */
 
     const history = useHistory();
+    const location = useLocation();
 
     const { cart, totalValue, freteValue } = useCart();
 
     const [ customer, setCustomer ] = useState({});
     const [ billing, setBilling ] = useState({});
+    const [ shipping, setShipping ] = useState({});
 
     const [ paymentMethod, setPaymentMethod ] = useState('');
     const [ amount, setAmount ] = useState(0);
@@ -53,50 +55,32 @@ export default function Payment(props) {
             card_cvv: cvc,
             customer,
             billing,
+            shipping,
             items
         }
+        console.log(data)
         api.post('/credit-card', data)
         .then(response => console.log(response.data))
         .catch(err => console.log(err.response.data.error, err.response.data.message))
     }
 
     function loadingDataUser() {
-        const customer =  {
-            external_id: "#3311",
-            name: "Morpheus Fishburne",
-            type: "individual",
-            country: "br",
-            email: "mopheus@nabucodonozor.com",
-            documents: [
-              {
-                type: "cpf",
-                number: "30621143049"
-              }
-            ],
-            phone_numbers: ["+5511999998888", "+5511888889999"],
-            birthday: "1965-01-01"
-        };
-        const billing = {
-            name: "Trinity Moss",
-            address: {
-                country: "br",
-                state: "sp",
-                city: "Cotia",
-                neighborhood: "Rio Cotia",
-                street: "Rua Matrix",
-                street_number: "9999",
-                zipcode: "06714360"
-            }
-        };
+        const customer = location.state.customer;
+        const shipping = location.state.shipping;
+        const billing = location.state.billing;
         setCustomer(customer);
+        setShipping(shipping);
         setBilling(billing);
     }
+
+    useEffect(() => {
+        loadingDataUser();
+    }, [])
 
     useEffect(() => {
         const amount = parseFloat(totalValue) + parseFloat(freteValue);
         setAmount(amount);
         setPaymentMethod('credit_card');
-        loadingDataUser();
     }, [totalValue, freteValue])
     
     return (

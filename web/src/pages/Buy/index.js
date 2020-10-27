@@ -5,13 +5,14 @@ import {useCart} from '../../context/cart';
 
 import { Title, MethodPayment } from './styles';
 
-export default function Buy() {
+export default function Buy(props) {
 
     const history = useHistory();
 
     const { cart, totalValue, freteValue } = useCart();
 
     const [ customer, setCustomer ] = useState({});
+    const [ billing, setBilling ] = useState({});
     const [ shipping, setShipping ] = useState({});
 
     function handlePaymentBoleto(e) {
@@ -31,7 +32,8 @@ export default function Buy() {
             amount: totalValue,
             items,
             customer,
-            shipping
+            shipping,
+            billing,
         }
         console.log(data);
         api.post('/boleto', data)
@@ -56,23 +58,11 @@ export default function Buy() {
             birthday: "1965-01-01"
         };
         
-        const shipping = {
-            name: "Neo Reeves",
-            fee: 1000,
-            delivery_date: "2000-12-21",
-            expedited: true,
-            address: {
-                country: "br",
-                state: "sp",
-                city: "Cotia",
-                neighborhood: "Rio Cotia",
-                street: "Rua Matrix",
-                street_number: "9999",
-                zipcode: "06714360"
-            }
-        };
+        const shipping = props.location.state.shipping;
+        const billing = props.location.state.billing;
         setCustomer(customer);
         setShipping(shipping);
+        setBilling(billing);
     }
 
     useEffect(() => {
@@ -85,7 +75,14 @@ export default function Buy() {
             <p>Pagamento</p>
         </Title>
         <MethodPayment>
-            <Link to="/payment">Pagar com cartão de crédito R$ ({parseFloat(totalValue) + parseFloat(freteValue)})</Link>
+            <Link 
+                to={{
+                    pathname: '/payment',
+                    state: {shipping, billing, customer}
+                }}
+            >
+                Pagar com cartão de crédito R$ ({parseFloat(totalValue) + parseFloat(freteValue)})
+            </Link>
             <button onClick={e => handlePaymentBoleto(e)}>Pagar com boleto bancario (R$ {parseFloat(totalValue) + parseFloat(freteValue)})</button>
             <button onClick={e => history.goBack()}>Voltar</button>
         </MethodPayment>
